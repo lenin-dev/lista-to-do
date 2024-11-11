@@ -4,7 +4,8 @@ import Usuarios from '../../models/class/usuarios.service.js';
 
 const app = express();
 
-app.get('/', async (req, res, next) => {
+app.get('/',
+async (req, res, next) => {
     try {
         const usuarios = new Usuarios(pool);
 
@@ -15,10 +16,12 @@ app.get('/', async (req, res, next) => {
     }
 });
 
-app.post('/', async (req, res, next) => {
+app.post('/', 
+async (req, res, next) => {
     try {
         const usuarios = new Usuarios(pool);
         const { usuario, password } = req.body;
+
         await usuarios.adduser(usuario, password);
         res.status(201).json({
             mensaje: 'Usuario creado con éxito'
