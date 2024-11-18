@@ -15,19 +15,44 @@ export default class Usuarios {
         const con = await this.pool.connect();
         try {
             const rows = await con.query(`SELECT u.idusuario, u.usuario, 
-                array_agg(
-                    jsonb_build_object(
-                        'idfuncion', f.idfuncion,
-                        'funcion', f.funcion,
-                        'descripcion', f.descripcion
-                    )
-                ) AS funciones,
-            u.fechacreacion
-            FROM usuarios AS u
-            JOIN funciones_usuarios AS fu ON u.idusuario = fu.idusuario
-            JOIN funciones AS f ON fu.idfuncion = f.idfuncion
-            GROUP BY u.idusuario, u.usuario`);
+                    array_agg(
+                        jsonb_build_object(
+                            'idfuncion', f.idfuncion,
+                            'funcion', f.funcion,
+                            'descripcion', f.descripcion
+                        )
+                    ) AS funciones,
+                u.fechacreacion
+                FROM usuarios AS u
+                JOIN funciones_usuarios AS fu ON u.idusuario = fu.idusuario
+                JOIN funciones AS f ON fu.idfuncion = f.idfuncion
+                GROUP BY u.idusuario, u.usuario`);
             if(rows.rows.length === 0) { createError('No hay ningun usuario almacenado', 400); }
+            return rows.rows;
+        } catch (error) {
+            throw error;
+        } finally {
+            con.release();
+        }
+    }
+
+    public async oneusers(busqueda: string) {
+        const con = await this.pool.connect();
+        try {
+            const rows = await con.query(`SELECT u.idusuario, u.usuario, 
+                    array_agg(
+                        jsonb_build_object(
+                            'idfuncion', f.idfuncion,
+                            'funcion', f.funcion,
+                            'descripcion', f.descripcion
+                        )
+                    ) AS funciones,
+                u.fechacreacion
+                FROM usuarios AS u
+                JOIN funciones_usuarios AS fu ON u.idusuario = fu.idusuario
+                JOIN funciones AS f ON fu.idfuncion = f.idfuncion
+                WHERE u.usuario LIKE $1 OR u.idusuario = $2
+                GROUP BY u.idusuario, u.usuario`, ['%'+busqueda+'%', busqueda]);
             return rows.rows;
         } catch (error) {
             throw error;

@@ -20,12 +20,11 @@ async (req, res, next) => {
 app.get('/:buscar',
 async (req, res, next) => {
     try {
-        const funciones_user = new Funciones_Usuario(pool);
         const usuarios = new Usuarios(pool);
 
-        const resultUsuario = await usuarios.allusers();
-        const funcionesPorUsuario = await funciones_user.allfuncionesuser();
-
+        const { buscar } = req.params;
+        const resultUsuario = await usuarios.oneusers(buscar);
+        res.status(200).json(resultUsuario);
     } catch (error) {
         next(error);
     }
